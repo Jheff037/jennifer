@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Una Carta Para Ti</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Dancing+Script:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: #0a0a0a;
+        color: #fff;
+        font-family: "Roboto", sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .button-container {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 50vh;
+      }
+
+      .magic-button {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        border: none;
+        padding: 18px 36px;
+        font-size: 18px;
+        font-family: "Playfair Display", serif;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(106, 17, 203, 0.4);
+        transition: all 0.3s ease;
+        transform: scale(1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .magic-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 25px rgba(106, 17, 203, 0.6);
+      }
+
+      .magic-button:active {
+        transform: scale(0.98);
+      }
+
+      .magic-button::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.2) 0%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      .magic-button:hover::after {
+        opacity: 1;
+      }
+
+      .counter {
+        margin-top: 15px;
+        text-align: center;
+        font-size: 14px;
+        color: #aaa;
+        opacity: 0.7;
+      }
+
+      .content-container {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 50vh;
+        padding: 20px 0;
+      }
+
+      .photo-container {
+        width: 100%;
+        max-width: 320px;
+        height: 320px;
+        border-radius: 20px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 30px 0;
+      }
+
+      .photo-frame {
+        width: 100%;
+        height: 100%;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .rgb-border {
+        position: absolute;
+        top: -4px;
+        left: -4px;
+        right: -4px;
+        bottom: -4px;
+        background: linear-gradient(
+          45deg,
+          #ff0000,
+          #ff9900,
+          #33cc33,
+          #3399ff,
+          #cc33ff,
+          #ff0000
+        );
+        background-size: 400% 400%;
+        border-radius: 24px;
+        z-index: -1;
+        animation: rgbAnimation 4s linear infinite;
+        filter: blur(8px);
+      }
+
+      .photo-placeholder {
+        width: calc(100% - 8px);
+        height: calc(100% - 8px);
+        background: rgba(20, 20, 20, 0.8);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 16px;
+        text-align: center;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .photo-placeholder i {
+        font-size: 64px;
+        margin-bottom: 20px;
+        opacity: 0.6;
+      }
+
+      .message-container {
+        max-width: 600px;
+        text-align: center;
+        padding: 30px;
+        margin-top: 20px;
+      }
+
+      .message {
+        font-size: 22px;
+        line-height: 1.6;
+        color: #f8bbd9;
+        font-weight: 400;
+        letter-spacing: 0.5px;
+        font-family: "Playfair Display", serif;
+      }
+
+      /* Estilos para la carta */
+      .card-container {
+        width: 100%;
+        max-width: 500px;
+        margin: 40px auto;
+        perspective: 1000px;
+      }
+
+      .love-card {
+        width: 100%;
+        height: 730px;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 1s;
+        cursor: pointer;
+      }
+
+      .love-card.flipped {
+        transform: rotateY(180deg);
+      }
+
+      .card-front,
+      .card-back {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        backface-visibility: hidden;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      .card-front {
+        background: linear-gradient(135deg, #8b0000, #b22222);
+        color: white;
+      }
+
+      .card-back {
+        background: #f9f3e9;
+        color: #5a3921;
+        transform: rotateY(180deg);
+        overflow-y: auto;
+        font-family: "Dancing Script", cursive;
+      }
+
+      .heart-seal {
+        width: 80px;
+        height: 80px;
+        background: #ff6b6b;
+        position: relative;
+        transform: rotate(45deg);
+        margin-top: 20px;
+        box-shadow: 0 0 20px rgba(255, 107, 107, 0.7);
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .heart-seal:hover {
+        transform: rotate(45deg) scale(1.1);
+        box-shadow: 0 0 30px rgba(255, 107, 107, 0.9);
+      }
+
+      .heart-seal:before,
+      .heart-seal:after {
+        content: "";
+        width: 80px;
+        height: 80px;
+        background: #ff6b6b;
+        border-radius: 50%;
+        position: absolute;
+      }
+
+      .heart-seal:before {
+        top: -40px;
+        left: 0;
+      }
+
+      .heart-seal:after {
+        top: 0;
+        left: -40px;
+      }
+
+      .card-title {
+        font-family: "Playfair Display", serif;
+        font-size: 28px;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+
+      .card-instruction {
+        font-size: 16px;
+        margin-top: 15px;
+        opacity: 0.8;
+        text-align: center;
+      }
+
+      .love-note {
+        font-size: 22px;
+        line-height: 1.6;
+        text-align: center;
+        padding: 10px;
+      }
+
+      .signature {
+        margin-top: 20px;
+        font-size: 24px;
+        text-align: right;
+        width: 100%;
+        font-weight: bold;
+      }
+
+      /* Animación del marco RGB */
+      @keyframes rgbAnimation {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      /* Contenedor de fuegos artificiales */
+      .fireworks-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      /* Partículas de fuegos artificiales */
+      .particle {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        opacity: 0;
+      }
+
+      /* Efectos de brillo */
+      .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(10px);
+        opacity: 0;
+      }
+
+      /* Animaciones de entrada */
+      .fade-in {
+        animation: fadeIn 1.5s ease forwards;
+      }
+
+      .slide-up {
+        animation: slideUp 1s ease forwards;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .photo-container {
+          height: 280px;
+          max-width: 280px;
+        }
+
+        .message {
+          font-size: 18px;
+          padding: 0 10px;
+        }
+
+        .magic-button {
+          padding: 15px 30px;
+          font-size: 16px;
+        }
+
+        .love-card {
+          height: 250px;
+        }
+
+        .card-title {
+          font-size: 24px;
+        }
+
+        .love-note {
+          font-size: 18px;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .photo-container {
+          height: 250px;
+          max-width: 250px;
+        }
+
+        .message {
+          font-size: 16px;
+        }
+
+        .love-card {
+          height: 220px;
+        }
+
+        .card-title {
+          font-size: 22px;
+        }
+
+        .love-note {
+          font-size: 16px;
+        }
+
+        .heart-seal {
+          width: 60px;
+          height: 60px;
+        }
+
+        .heart-seal:before,
+        .heart-seal:after {
+          width: 60px;
+          height: 60px;
+        }
+
+        .heart-seal:before {
+          top: -30px;
+        }
+
+        .heart-seal:after {
+          left: -30px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="button-container" id="buttonContainer">
+        <button class="magic-button" id="magicButton">Hazme clic</button>
+        <div class="counter" id="counter">Clics: 0/6</div>
+      </div>
+
+      <div class="content-container" id="contentContainer">
+        <div class="photo-container fade-in">
+          <div class="photo-frame">
+            <div class="rgb-border"></div>
+            <div class="photo-placeholder">
+              <i><img src="img/yo y mi amor.jpeg" alt="" width="100%" /></i>
+              <p></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="message-container slide-up">
+          <div class="message">
+            Feliz dia mi amor
+            <br />
+            "Cada clic fue un latido de emoción, cada explosión un destello de
+            alegría. Como estos fuegos artificiales, nuestro amor brilla
+            intensamente apesar de la distancia. Eres la luz que ilumina mi
+            vida."
+          </div>
+        </div>
+
+        <!-- Tarjeta de amor -->
+        <div class="card-container fade-in">
+          <div class="love-card" id="loveCard">
+            <div class="card-front">
+              <h2 class="card-title">Para Jennifer</h2>
+              <p>Toca el corazón para abrir</p>
+              <div class="heart-seal" id="heartSeal"></div>
+              <p class="card-instruction">Haz clic en el corazón</p>
+            </div>
+            <div class="card-back">
+              <div class="love-note">
+                <p>Mi amor,</p>
+                <p>
+                  Desde que llegaste a mi vida, cada día tiene más color, más
+                  sentido y más felicidad. Eres esa chispa que ilumina mis días
+                  y el sueño que acaricio cada noche. Apesar de la distancia
+                  cada noche y te ries de mis tonterias me siento muy cerca de
+                  ti, siento que encontre una parte di mi.
+                </p>
+                <p>
+                  Se que aun no nos vemos, pero ya llegara el dia y me haras el
+                  chico mas feliz de este planeta.
+                </p>
+                <p>
+                  Tu sonrisa es mi mayor tesoro, tu amor mi mayor fortuna. No
+                  hay distancia ni obstáculo que pueda apagar lo que siento por
+                  ti.
+                </p>
+                <p>Te amo hoy, mañana y siempre mi ngerita hermosa.</p>
+                <div class="signature">Con todo mi amor par ti Jennifer</div>
+                <br />
+                <div class="signature">De: Tu Negrito</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fireworks-container" id="fireworksContainer"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const magicButton = document.getElementById("magicButton");
+        const counter = document.getElementById("counter");
+        const buttonContainer = document.getElementById("buttonContainer");
+        const contentContainer = document.getElementById("contentContainer");
+        const fireworksContainer =
+          document.getElementById("fireworksContainer");
+        const loveCard = document.getElementById("loveCard");
+        const heartSeal = document.getElementById("heartSeal");
+
+        let clickCount = 0;
+        const maxClicks = 6;
+        let buttonScale = 1;
+        let fireworksInterval;
+
+        magicButton.addEventListener("click", function () {
+          clickCount++;
+          counter.textContent = `Clics: ${clickCount}/${maxClicks}`;
+
+          // Aumentar tamaño del botón
+          buttonScale += 0.1;
+          magicButton.style.transform = `scale(${buttonScale})`;
+
+          // Efecto de partículas en el botón
+          createButtonParticles();
+
+          if (clickCount === maxClicks) {
+            // Ocultar el botón y mostrar fuegos artificiales
+            buttonContainer.style.opacity = "0";
+            buttonContainer.style.pointerEvents = "none";
+
+            // Activar fuegos artificiales continuos
+            startContinuousFireworks();
+
+            // Después de un breve retraso, mostrar el contenido
+            setTimeout(() => {
+              buttonContainer.style.display = "none";
+              contentContainer.style.display = "flex";
+            }, 1000);
+          }
+        });
+
+        // Evento para la carta de amor
+        heartSeal.addEventListener("click", function (e) {
+          e.stopPropagation();
+          loveCard.classList.toggle("flipped");
+        });
+
+        loveCard.addEventListener("click", function () {
+          this.classList.toggle("flipped");
+        });
+
+        function createButtonParticles() {
+          const buttonRect = magicButton.getBoundingClientRect();
+
+          for (let i = 0; i < 10; i++) {
+            const particle = document.createElement("div");
+            particle.classList.add("particle");
+
+            // Tamaño y color aleatorios
+            const size = Math.random() * 6 + 2;
+            const colors = ["#6a11cb", "#2575fc", "#ff3366", "#33ccff"];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.backgroundColor = color;
+
+            // Posición inicial (centro del botón)
+            const startX = buttonRect.left + buttonRect.width / 2;
+            const startY = buttonRect.top + buttonRect.height / 2;
+
+            particle.style.left = `${startX}px`;
+            particle.style.top = `${startY}px`;
+
+            // Dirección aleatoria
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 50 + 30;
+            const endX = startX + Math.cos(angle) * distance;
+            const endY = startY + Math.sin(angle) * distance;
+
+            // Animación
+            particle.style.transition = `all 0.8s ease-out`;
+            particle.style.opacity = "1";
+
+            document.body.appendChild(particle);
+
+            // Mover partícula
+            setTimeout(() => {
+              particle.style.left = `${endX}px`;
+              particle.style.top = `${endY}px`;
+              particle.style.opacity = "0";
+
+              // Eliminar partícula después de la animación
+              setTimeout(() => {
+                if (document.body.contains(particle)) {
+                  document.body.removeChild(particle);
+                }
+              }, 800);
+            }, 10);
+          }
+        }
+
+        function startContinuousFireworks() {
+          // Lanzar fuegos artificiales continuamente
+          fireworksInterval = setInterval(() => {
+            createFirework();
+          }, 500);
+
+          // Lanzar varios fuegos artificiales iniciales
+          for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+              createFirework();
+            }, i * 200);
+          }
+        }
+
+        function createFirework() {
+          // Crear fuego artificial
+          const firework = document.createElement("div");
+          firework.classList.add("particle");
+
+          // Posición aleatoria en la pantalla
+          const startX = Math.random() * window.innerWidth;
+          const startY = window.innerHeight;
+
+          firework.style.width = "6px";
+          firework.style.height = "6px";
+          firework.style.backgroundColor = "#ffffff";
+          firework.style.left = `${startX}px`;
+          firework.style.top = `${startY}px`;
+          firework.style.opacity = "1";
+          firework.style.boxShadow = "0 0 10px 2px rgba(255,255,255,0.8)";
+
+          fireworksContainer.appendChild(firework);
+
+          // Altura objetivo (aleatoria)
+          const targetY = Math.random() * (window.innerHeight / 2) + 50;
+
+          // Animación de ascenso
+          firework.style.transition = `all ${
+            0.8 + Math.random() * 0.5
+          }s ease-out`;
+
+          setTimeout(() => {
+            firework.style.top = `${targetY}px`;
+
+            // Explosión
+            setTimeout(() => {
+              createExplosion(startX, targetY);
+              if (fireworksContainer.contains(firework)) {
+                fireworksContainer.removeChild(firework);
+              }
+            }, 900 + Math.random() * 300);
+          }, 10);
+        }
+
+        function createExplosion(x, y) {
+          const particleCount = 40;
+          const colors = [
+            "#ff3366",
+            "#33ccff",
+            "#ffcc00",
+            "#33ff66",
+            "#cc33ff",
+            "#ff9933",
+            "#66ff33",
+            "#ff3333",
+          ];
+
+          for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement("div");
+            particle.classList.add("particle");
+
+            // Tamaño aleatorio
+            const size = Math.random() * 6 + 2;
+
+            // Color aleatorio
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.backgroundColor = color;
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            particle.style.opacity = "1";
+            particle.style.boxShadow = `0 0 8px 1px ${color}`;
+
+            fireworksContainer.appendChild(particle);
+
+            // Dirección aleatoria
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 80 + 40;
+            const endX = x + Math.cos(angle) * distance;
+            const endY = y + Math.sin(angle) * distance;
+
+            // Animación
+            particle.style.transition = `all ${
+              0.8 + Math.random() * 0.4
+            }s ease-out`;
+
+            setTimeout(() => {
+              particle.style.left = `${endX}px`;
+              particle.style.top = `${endY}px`;
+              particle.style.opacity = "0";
+
+              // Eliminar partícula después de la animación
+              setTimeout(() => {
+                if (fireworksContainer.contains(particle)) {
+                  fireworksContainer.removeChild(particle);
+                }
+              }, 1200);
+            }, 10);
+
+            // Crear efecto de brillo
+            if (Math.random() > 0.7) {
+              const glow = document.createElement("div");
+              glow.classList.add("glow");
+
+              glow.style.width = `${size * 8}px`;
+              glow.style.height = `${size * 8}px`;
+              glow.style.backgroundColor = color;
+              glow.style.left = `${x - size * 4}px`;
+              glow.style.top = `${y - size * 4}px`;
+              glow.style.opacity = "0.7";
+
+              fireworksContainer.appendChild(glow);
+
+              // Animación del brillo
+              glow.style.transition = `all 0.6s ease-out`;
+
+              setTimeout(() => {
+                glow.style.opacity = "0";
+                glow.style.transform = "scale(1.5)";
+
+                setTimeout(() => {
+                  if (fireworksContainer.contains(glow)) {
+                    fireworksContainer.removeChild(glow);
+                  }
+                }, 600);
+              }, 10);
+            }
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
